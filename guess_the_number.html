@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="w-full py-6 px-8 flex justify-between items-center border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md">
+        <div class="flex items-center space-x-3">
+            <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30 text-xl">🎲</div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Guess The Number</h1>
+                <p class="text-xs text-slate-400">Your C code brought to the web!</p>
+            </div>
+        </div>
+        <div id="statsBadge" class="hidden px-4 py-1.5 rounded-full bg-slate-900 border border-slate-700/60 text-xs font-medium text-slate-300 shadow-inner">
+            Attempts: <span id="attemptCountDisplay" class="text-indigo-400 font-bold">0</span>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow flex items-center justify-center p-4 sm:p-6">
+        <div class="w-full max-w-md bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+            
+            <!-- Glow background decoration -->
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- STEP 1: Difficulty Selection Screen -->
+            <div id="difficultyScreen" class="space-y-6">
+                <div class="text-center space-y-2">
+                    <h2 class="text-2xl font-bold tracking-tight text-white">Select Difficulty</h2>
+                    <p class="text-sm text-slate-400">Choose your challenge level to start the game.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="startGame(1)" class="w-full group relative flex items-center justify-between p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:bg-indigo-600/10 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer shadow-sm">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-sm border border-emerald-500/20">1</span>
+                            <div class="text-left">
+                                <p class="font-semibold text-slate-200 group-hover:text-indigo-300 transition-colors">Easy Mode</p>
+                                <p class="text-xs text-slate-400">Number range: 1 to 10</p>
+                            </div>
+                        </div>
+                        <span class="text-slate-500 group-hover:text-indigo-400 transition-colors">→</span>
+                    </button>
+
+                    <button onclick="startGame(2)" class="w-full group relative flex items-center justify-between p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:bg-indigo-600/10 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer shadow-sm">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-sm border border-amber-500/20">2</span>
+                            <div class="text-left">
+                                <p class="font-semibold text-slate-200 group-hover:text-indigo-300 transition-colors">Medium Mode</p>
+                                <p class="text-xs text-slate-400">Number range: 1 to 100</p>
+                            </div>
+                        </div>
+                        <span class="text-slate-500 group-hover:text-indigo-400 transition-colors">→</span>
+                    </button>
+
+                    <button onclick="startGame(3)" class="w-full group relative flex items-center justify-between p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:bg-indigo-600/10 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer shadow-sm">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-sm border border-rose-500/20">3</span>
+                            <div class="text-left">
+                                <p class="font-semibold text-slate-200 group-hover:text-indigo-300 transition-colors">Hard Mode</p>
+                                <p class="text-xs text-slate-400">Number range: 1 to 1000</p>
+                            </div>
+                        </div>
+                        <span class="text-slate-500 group-hover:text-indigo-400 transition-colors">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Gameplay Screen -->
+            <div id="gameScreen" class="hidden space-y-6">
+                <div class="flex justify-between items-center bg-slate-950/40 p-3 rounded-xl border border-slate-800">
+                    <div>
+                        <span id="difficultyLabel" class="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Level</span>
+                    </div>
+                    <button onclick="resetToMenu()" class="text-xs text-slate-400 hover:text-slate-200 underline transition-colors cursor-pointer">Change Level</button>
+                </div>
+
+                <div class="text-center space-y-1">
+                    <h2 class="text-xl font-semibold text-slate-200">Make Your Guess</h2>
+                    <p id="rangeHint" class="text-xs text-slate-400">Enter a number within range</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="relative">
+                        <input type="number" id="guessInput" placeholder="Type your guess..." class="w-full bg-slate-950/60 border border-slate-700 rounded-2xl px-4 py-3.5 text-center text-lg font-semibold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-inner" autofocus onkeypress="handleKeyPress(event)">
+                    </div>
+                    <button onclick="submitGuess()" class="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-semibold py-3.5 px-4 rounded-2xl shadow-lg shadow-indigo-600/30 hover:from-indigo-500 hover:to-cyan-500 active:scale-[0.98] transition-all cursor-pointer">
+                        Submit Guess
+                    </button>
+                </div>
+
+                <!-- Feedback Box -->
+                <div id="feedbackBox" class="hidden p-4 rounded-2xl text-center text-sm font-medium border transition-all animate-fade-in"></div>
+
+                <!-- Recent Guesses History -->
+                <div id="historyContainer" class="hidden space-y-2">
+                    <p class="text-xs font-medium text-slate-400">Previous Guesses:</p>
+                    <div id="historyList" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1"></div>
+                </div>
+            </div>
+
+            <!-- STEP 3: Victory / Result Screen -->
+            <div id="victoryScreen" class="hidden text-center space-y-6 py-4">
+                <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-3xl flex items-center justify-center text-3xl mx-auto shadow-lg shadow-emerald-500/10 animate-bounce">
+                    🎉
+                </div>
+                <div class="space-y-2">
+                    <h2 class="text-2xl font-bold text-white">Awesome Job!</h2>
+                    <p class="text-sm text-slate-300">You guessed the correct number!</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 bg-slate-950/40 p-4 rounded-2xl border border-slate-800 text-left">
+                    <div>
+                        <p class="text-xs text-slate-400">Total Attempts</p>
+                        <p id="finalAttempts" class="text-xl font-bold text-indigo-400">0</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400">Final Score</p>
+                        <p id="finalScore" class="text-xl font-bold text-emerald-400">0</p>
+                    </div>
+                </div>
+
+                <button onclick="resetToMenu()" class="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-semibold py-3.5 px-4 rounded-2xl shadow-lg shadow-indigo-600/30 hover:from-indigo-500 hover:to-cyan-500 active:scale-[0.98] transition-all cursor-pointer">
+                    Play Again
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full py-4 text-center text-xs text-slate-500 border-t border-slate-900">
+        Number Guessing Game • Web Version
+    </footer>
+
+    <!-- JavaScript Game Engine -->
+    <script>
+        let targetNumber = 0;
+        let maxRange = 10;
+        let attempts = 0;
+        let guessHistory = [];
+
+        function startGame(level) {
+            attempts = 0;
+            guessHistory = [];
+            
+            if (level === 1) {
+                maxRange = 10;
+                targetNumber = Math.floor(Math.random() * 10) + 1;
+                document.getElementById('difficultyLabel').innerText = "Easy (1-10)";
+            } else if (level === 2) {
+                maxRange = 100;
+                targetNumber = Math.floor(Math.random() * 100) + 1;
+                document.getElementById('difficultyLabel').innerText = "Medium (1-100)";
+            } else if (level === 3) {
+                maxRange = 1000;
+                targetNumber = Math.floor(Math.random() * 1000) + 1;
+                document.getElementById('difficultyLabel').innerText = "Hard (1-1000)";
+            }
+
+            document.getElementById('rangeHint').innerText = `Enter a number between 1 and ${maxRange}`;
+            document.getElementById('attemptCountDisplay').innerText = attempts;
+            document.getElementById('statsBadge').classList.remove('hidden');
+            
+            // Switch views
+            document.getElementById('difficultyScreen').classList.add('hidden');
+            document.getElementById('victoryScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            
+            // Reset feedback & input
+            const feedback = document.getElementById('feedbackBox');
+            feedback.classList.add('hidden');
+            feedback.className = "hidden p-4 rounded-2xl text-center text-sm font-medium border";
+            document.getElementById('guessInput').value = '';
+            document.getElementById('historyContainer').classList.add('hidden');
+            document.getElementById('historyList').innerHTML = '';
+            
+            setTimeout(() => document.getElementById('guessInput').focus(), 100);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                submitGuess();
+            }
+        }
+
+        function submitGuess() {
+            const inputElement = document.getElementById('guessInput');
+            const userGuess = parseInt(inputElement.value);
+            const feedback = document.getElementById('feedbackBox');
+
+            if (isNaN(userGuess)) {
+                feedback.classList.remove('hidden');
+                feedback.className = "p-4 rounded-2xl text-center text-sm font-medium border bg-amber-500/10 border-amber-500/20 text-amber-300";
+                feedback.innerText = "⚠️ Please enter a valid number!";
+                return;
+            }
+
+            attempts++;
+            document.getElementById('attemptCountDisplay').innerText = attempts;
+            feedback.classList.remove('hidden');
+
+            if (userGuess === targetNumber) {
+                // Victory Condition
+                document.getElementById('finalAttempts').innerText = attempts;
+                document.getElementById('finalScore').innerText = attempts * 10;
+                
+                document.getElementById('gameScreen').classList.add('hidden');
+                document.getElementById('statsBadge').classList.add('hidden');
+                document.getElementById('victoryScreen').classList.remove('hidden');
+            } else {
+                if (userGuess > targetNumber) {
+                    feedback.className = "p-4 rounded-2xl text-center text-sm font-medium border bg-rose-500/10 border-rose-500/20 text-rose-300";
+                    feedback.innerText = `📈 Your guess (${userGuess}) is higher! Try again.`;
+                    guessHistory.push({val: userGuess, hint: 'High'});
+                } else {
+                    feedback.className = "p-4 rounded-2xl text-center text-sm font-medium border bg-cyan-500/10 border-cyan-500/20 text-cyan-300";
+                    feedback.innerText = `📉 Your guess (${userGuess}) is lower! Try again.`;
+                    guessHistory.push({val: userGuess, hint: 'Low'});
+                }
+                
+                updateHistoryUI();
+                inputElement.value = '';
+                inputElement.focus();
+            }
+        }
+
+        function updateHistoryUI() {
+            const container = document.getElementById('historyContainer');
+            const list = document.getElementById('historyList');
+            container.classList.remove('hidden');
+            
+            list.innerHTML = '';
+            guessHistory.forEach(item => {
+                const badge = document.createElement('span');
+                const badgeColor = item.hint === 'High' ? 'bg-rose-500/10 text-rose-300 border-rose-500/20' : 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20';
+                badge.className = `px-2.5 py-1 rounded-lg text-xs font-medium border ${badgeColor}`;
+                badge.innerText = `${item.val} (${item.hint === 'High' ? '↓' : '↑'})`;
+                list.appendChild(badge);
+            });
+        }
+
+        function resetToMenu() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('victoryScreen').classList.add('hidden');
+            document.getElementById('statsBadge').classList.add('hidden');
+            document.getElementById('difficultyScreen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
